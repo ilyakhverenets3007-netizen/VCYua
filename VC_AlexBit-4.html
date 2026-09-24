@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VC+AlexBit — Анкета</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; font-family:Arial, sans-serif;
+  color:#fff; background:
+  radial-gradient(circle at 15% 10%, #263b72 0, transparent 32%),
+  radial-gradient(circle at 85% 90%, #4d245f 0, transparent 30%),
+  #080b16;
+  display:flex; align-items:center; justify-content:center; padding:28px;
+}
+.card{
+  width:min(720px,100%); padding:34px; border:1px solid #ffffff22;
+  border-radius:26px; background:#111625dd; backdrop-filter:blur(16px);
+  box-shadow:0 24px 80px #0008;
+}
+.logo{font-size:30px;font-weight:800;letter-spacing:.5px}
+.logo span{color:#8b7cff}
+h1{font-size:32px;margin:22px 0 8px}
+.sub{color:#aeb6ca;margin:0 0 28px}
+label{display:block;font-weight:700;margin:20px 0 9px}
+textarea{
+  width:100%; min-height:120px; resize:vertical; padding:15px;
+  border-radius:14px; border:1px solid #ffffff1c; outline:none;
+  background:#0b0f1c; color:white; font:inherit;
+}
+textarea:focus{border-color:#8b7cff;box-shadow:0 0 0 3px #8b7cff22}
+.options{display:flex;gap:12px}
+.option{
+  flex:1; padding:15px; border:1px solid #ffffff1c; border-radius:14px;
+  background:#0b0f1c; cursor:pointer; text-align:center; transition:.2s;
+}
+.option:hover{border-color:#8b7cff}
+.option input{accent-color:#8b7cff;margin-right:7px}
+button{
+  width:100%; margin-top:28px; padding:16px; border:0; border-radius:14px;
+  background:linear-gradient(135deg,#7c6cff,#a15cff); color:white;
+  font-size:16px;font-weight:800;cursor:pointer;
+}
+button:hover{filter:brightness(1.12)}
+#status{display:none;margin-top:16px;padding:13px;border-radius:12px;background:#193526;color:#a9f5c7;text-align:center}
+.footer{text-align:center;color:#707991;font-size:12px;margin-top:22px}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="logo">VC<span>+</span>AlexBit</div>
+  <h1>Анкета для вступления во фракцию</h1>
+  <p class="sub">Заполни анкету внимательно. После отправки заявка будет готова для рассмотрения.</p>
+
+  <form id="form">
+    <label for="goal">1. Ради какой цели ты вступаешь во фракцию?</label>
+    <textarea id="goal" required placeholder="Напиши свой ответ..."></textarea>
+
+    <label for="company">2. Как ты относишься к нашей компании?</label>
+    <textarea id="company" required placeholder="Расскажи о своём отношении..."></textarea>
+
+    <label>3. Будешь ли ты следить за каналами ССЛА?</label>
+    <div class="options">
+      <label class="option"><input type="radio" name="sla" value="Да" required>Да</label>
+      <label class="option"><input type="radio" name="sla" value="Нет">Нет</label>
+    </div>
+
+    <button type="submit">Отправить анкету</button>
+    <div id="status">Анкета заполнена! Сейчас это демо-версия — данные никуда не отправляются.</div>
+  </form>
+  <div class="footer">VC+AlexBit • Анкета участника</div>
+</main>
+
+<script>
+document.getElementById('form').addEventListener('submit', async function(e){
+  e.preventDefault();
+
+  const webhook = "https://discord.com/api/webhooks/1552770714053124129/HzOL5jAeZ1N2qtEhignKMSikMKO1dKU08-AiJiZ0u2uRv7iB8XAK8fpyG72SA1I3ZX_t";
+  const goal = document.getElementById('goal').value.trim();
+  const company = document.getElementById('company').value.trim();
+  const sla = document.querySelector('input[name="sla"]:checked').value;
+
+  const payload = {
+    username: "VC+AlexBit",
+    embeds: [{
+      title: "📋 Новая анкета",
+      color: 9016176,
+      fields: [
+        { name: "🎯 Ради какой цели вступаешь?", value: goal || "—" },
+        { name: "🏢 Как относишься к нашей компании?", value: company || "—" },
+        { name: "📢 Будешь следить за каналами ССЛА?", value: sla }
+      ],
+      footer: { text: "VC+AlexBit • Анкета участника" }
+    }]
+  };
+
+  const status = document.getElementById('status');
+  try {
+    const response = await fetch(webhook, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) throw new Error("Ошибка Discord");
+    status.textContent = "🎉 Ты заполнил анкету! Теперь ты участник фракции!";
+    status.style.display = "block";
+    this.reset();
+  } catch (error) {
+    status.textContent = "❌ Не удалось отправить анкету. Проверь Webhook и настройки Discord.";
+    status.style.display = "block";
+  }
+});
+</script>
+</body>
+</html>
